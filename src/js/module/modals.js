@@ -2,18 +2,27 @@ const modals = (state) => {
 
     var validateFormFlag = true;
 
+
+
     function bindModal(triggerSelector, modalSelector, closeSelector, closeClickOverlay = true, options = false) {
         const trigger = document.querySelectorAll(triggerSelector),
             modal = document.querySelector(modalSelector),
             close = document.querySelector(closeSelector),
-            window = document.querySelectorAll('[data-modal]');
+            window = document.querySelectorAll('[data-modal]'),
+            scroll = calcScroll();
 
         const windowClosed = () => {
             window.forEach(item => {
                 item.style.display = 'none';
             });
+            document.body.style.overflow = '';
+            document.body.style.marginRight = '0px';
         };
 
+        const owerflowHidden = () =>{
+            document.body.style.overflow = 'hidden';
+            document.body.style.marginRight = `${scroll}px`;
+        };
         trigger.forEach(item => {
 
             item.addEventListener('click', (e) => {
@@ -23,23 +32,13 @@ const modals = (state) => {
                 if (options === false) {
                     windowClosed();
                     modal.style.display = 'block';
-                    document.body.style.overflow = 'hidden';
-                    // document.body.classList.add('modal-open')
+                    owerflowHidden();
                 } else {
                     validateForm(state,options);
-                   /* validateFormFlag = true;
-                    options.some(item => {
-                        if (!(item in state)) {
-                            validateFormFlag = false;
-                        }
-                    });*/
                     if (validateFormFlag) {
-
                         windowClosed();
-
                         modal.style.display = 'block';
-                        document.body.style.overflow = 'hidden';
-                        // document.body.classList.add('modal-open')
+                        owerflowHidden();
                     }
                 }
             });
@@ -48,17 +47,11 @@ const modals = (state) => {
 
         close.addEventListener('click', () => {
             windowClosed();
-            // modal.style.display = 'none';
-            document.body.style.overflow = '';
-            // document.body.classList.remove('modal-open')
         });
 
         modal.addEventListener('click', (e) => {
             if (e.target === modal && closeClickOverlay) {
                 windowClosed();
-                // modal.style.display = 'none';
-                document.body.style.overflow = '';
-                // document.body.classList.remove('modal-open')
             }
         })
     }
@@ -75,9 +68,25 @@ const modals = (state) => {
     function showModalByTyme(selector, time) {
         setTimeout(() => {
             document.querySelector(selector).style.display = 'block';
-            document.body.style.overflow = 'hidden';
+            owerflowHidden();
         }, time);
+    }
 
+    function calcScroll(){
+        let div = document.createElement('div');
+
+        div.style.width = '50px';
+        div.style.height = '50px';
+        div.style.overflowY = 'scroll';
+        div.style.visibility = 'hidden';
+
+        document.body.append(div);
+
+        let scrollWidth = div.offsetWidth - div.clientWidth;
+
+        div.remove();
+
+        return scrollWidth;
     }
 
     bindModal('.popup_engineer_btn', '.popup_engineer', '.popup_engineer .popup_close');
